@@ -1,5 +1,5 @@
 var apiKey = "fd1f2ef3b4987995a3d25c966c0dded0"
-
+var previousSearches = [];
 
 $("form").submit(citySearch)
 
@@ -22,17 +22,20 @@ function citySearch(e) {
     var city =$("#city").val();
     var apiUrlCurrent = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + apiKey
     var apiUrl5DayForcast = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey
+    $("#currentWeatherCard").empty()
+    $("#fiveDayCard").empty()
+
      fetch (apiUrlCurrent)
          .then(function (response){
              return response.json();
          })
          .then(function(data) {
-             var cityName = $("#cityName")
+             var cityName = $("<h3>")
              
              var temperature = $("<p>").text("Temp: " + data.main.temp + " F\u00B0")
              var windSpeed = $("<p>").text("Wind Speed: " + data.wind.speed + "mph")
              var humidity = $("<p>").text("Humidity: " + data.main.humidity + "%")
-             var currentWeather = $("#currentWeather")
+             var currentWeather = $("#currentWeatherCard")
              var image = getIconImage(data.weather[0].icon)
              var cityDate = getCityDate(data.dt)
              cityName[0].innerHTML= data.name + cityDate 
@@ -41,6 +44,8 @@ function citySearch(e) {
              currentWeather.append(temperature)
              currentWeather.append(windSpeed)
              currentWeather.append(humidity)
+             previousSearches.push(data.name)
+             localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
              console.log(data)
 
          })
@@ -50,11 +55,13 @@ function citySearch(e) {
          })
          .then(function(data) {
              var fiveDayCard = $("#fiveDayCard")
-             var fiveDayTitle = $("#fiveDayTitle").text("5-Day Forecast")
+             var fiveDayTitle = $("<h3>").text("5-Day Forecast")
              fiveDayCard.append(fiveDayTitle);
+             var container = $("<div>").attr("class", "row");
+             fiveDayCard.append(container)
+
              for(var i=0; i < data.list.length; i+=8){
                  
-                 var container = $("#fiveDay");
                  var day = $("<div>").attr("class", "col-2");
                  var date = $("<h4>").text(getCityDate(data.list[i].dt));
                  var image = getIconImage(data.list[i].weather[0].icon)
@@ -70,4 +77,5 @@ function citySearch(e) {
                 }
                 console.log(data);
          })
+         $("#city").val("")
  }
