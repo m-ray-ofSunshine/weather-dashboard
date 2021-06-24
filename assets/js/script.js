@@ -17,6 +17,23 @@ function getIconImage (iconCode) {
 }
 
 
+function renderSearches() {
+    searches = JSON.parse(localStorage.getItem("previousSearches"))
+    var searchResults = $("#searchResults")
+    for (var i=0; i<searches.length; i++){
+        var resultBtn = $("<button>").text(searches[i])
+        searchResults.append(resultBtn);
+    }
+}
+function beenSearched(input) {
+    for ( var i = 0; i<previousSearches.length; i++)
+        if( input != previousSearches[i]){
+            previousSearches.push(input)
+            localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
+        }
+    
+}
+
 function citySearch(e) {
     e.preventDefault();
     var city =$("#city").val();
@@ -24,19 +41,18 @@ function citySearch(e) {
     var apiUrl5DayForcast = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey
     $("#currentWeatherCard").empty()
     $("#fiveDayCard").empty()
-
-     fetch (apiUrlCurrent)
-         .then(function (response){
+    fetch (apiUrlCurrent)
+    .then(function (response){
              return response.json();
-         })
-         .then(function(data) {
-             var cityName = $("<h3>")
-             
-             var temperature = $("<p>").text("Temp: " + data.main.temp + " F\u00B0")
-             var windSpeed = $("<p>").text("Wind Speed: " + data.wind.speed + "mph")
-             var humidity = $("<p>").text("Humidity: " + data.main.humidity + "%")
-             var currentWeather = $("#currentWeatherCard")
-             var image = getIconImage(data.weather[0].icon)
+            })
+            .then(function(data) {
+                var cityName = $("<h3>")
+                
+                var temperature = $("<p>").text("Temp: " + data.main.temp + " F\u00B0")
+                var windSpeed = $("<p>").text("Wind Speed: " + data.wind.speed + "mph")
+                var humidity = $("<p>").text("Humidity: " + data.main.humidity + "%")
+                var currentWeather = $("#currentWeatherCard")
+                var image = getIconImage(data.weather[0].icon)
              var cityDate = getCityDate(data.dt)
              cityName[0].innerHTML= data.name + cityDate 
              cityName.append(image)
@@ -44,22 +60,23 @@ function citySearch(e) {
              currentWeather.append(temperature)
              currentWeather.append(windSpeed)
              currentWeather.append(humidity)
-             previousSearches.push(data.name)
-             localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
-             console.log(data)
-
-         })
-         fetch (apiUrl5DayForcast)
-         .then(function (response){
-             return response.json();
-         })
-         .then(function(data) {
-             var fiveDayCard = $("#fiveDayCard")
-             var fiveDayTitle = $("<h3>").text("5-Day Forecast")
-             fiveDayCard.append(fiveDayTitle);
+             //previousSearches.push(data.name)
+             //localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
+             //console.log(data)
+             beenSearched(data.name)
+             
+            })
+            fetch (apiUrl5DayForcast)
+            .then(function (response){
+                return response.json();
+            })
+            .then(function(data) {
+                var fiveDayCard = $("#fiveDayCard")
+                var fiveDayTitle = $("<h3>").text("5-Day Forecast")
+                fiveDayCard.append(fiveDayTitle);
              var container = $("<div>").attr("class", "row");
              fiveDayCard.append(container)
-
+             
              for(var i=0; i < data.list.length; i+=8){
                  
                  var day = $("<div>").attr("class", "col-2");
@@ -75,7 +92,12 @@ function citySearch(e) {
                  day.append(humidity);
                  container.append(day);
                 }
-                console.log(data);
-         })
-         $("#city").val("")
- }
+                // console.log(data);
+            })
+            $("#city").val("")
+            if (previousSearches === undefined){
+                return;
+            }else {
+            renderSearches();
+            }
+        }
