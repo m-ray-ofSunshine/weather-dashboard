@@ -2,14 +2,14 @@ var apiKey = "fd1f2ef3b4987995a3d25c966c0dded0"
 var previousSearches = [];
 
 $("form").submit(citySearch)
-
+renderSearches()
 function getCityDate(unix) {
     var a = new Date(unix * 1000);
-    var cityDate = " ("+(a.getMonth()+1)+"-"+a.getDate()+"-"+a.getFullYear()+") ";
+    var cityDate = " (" + (a.getMonth() + 1) + "-" + a.getDate() + "-" + a.getFullYear() + ") ";
     return cityDate;
 }
 
-function getIconImage (iconCode) {
+function getIconImage(iconCode) {
     var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
     var image = $("<img>")
     image.attr("src", iconUrl);
@@ -17,87 +17,94 @@ function getIconImage (iconCode) {
 }
 
 
-function renderSearches() {
-    searches = JSON.parse(localStorage.getItem("previousSearches"))
-    var searchResults = $("#searchResults")
-    for (var i=0; i<searches.length; i++){
-        var resultBtn = $("<button>").text(searches[i])
-        searchResults.append(resultBtn);
+ function saveSearches(searchName) {
+     if (previousSearches.includes(searchName)){
+         return;
+     }else{
+         previousSearches.push(searchName)
+         localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
+     }
     }
-}
-function beenSearched(input) {
-    for ( var i = 0; i<previousSearches.length; i++)
-        if( input != previousSearches[i]){
-            previousSearches.push(input)
-            localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
-        }
+function renderSearches() {
+    var city = $("#city").val();
+    var previousSearchesList = $("#previousSearches")
+    previousSearchesList.empty();
+    var searches = JSON.parse(localStorage.getItem("previousSearches"))
+      for (var i = 0; i < searches.length; i++) {
+        
+          var resultBtn = $("<input>").attr("value", searches[i])
+          resultBtn.attr("class", "col-12")
+          resultBtn.attr("type", "submit")
+          previousSearchesList.append(resultBtn);
+    } 
+     
     
-}
+     
+  }
+
 
 function citySearch(e) {
     e.preventDefault();
-    var city =$("#city").val();
     var apiUrlCurrent = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + apiKey
     var apiUrl5DayForcast = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey
     $("#currentWeatherCard").empty()
     $("#fiveDayCard").empty()
-    fetch (apiUrlCurrent)
-    .then(function (response){
-             return response.json();
-            })
-            .then(function(data) {
-                var cityName = $("<h3>")
-                
-                var temperature = $("<p>").text("Temp: " + data.main.temp + " F\u00B0")
-                var windSpeed = $("<p>").text("Wind Speed: " + data.wind.speed + "mph")
-                var humidity = $("<p>").text("Humidity: " + data.main.humidity + "%")
-                var currentWeather = $("#currentWeatherCard")
-                var image = getIconImage(data.weather[0].icon)
-             var cityDate = getCityDate(data.dt)
-             cityName[0].innerHTML= data.name + cityDate 
-             cityName.append(image)
-             currentWeather.append(cityName)
-             currentWeather.append(temperature)
-             currentWeather.append(windSpeed)
-             currentWeather.append(humidity)
-             //previousSearches.push(data.name)
-             //localStorage.setItem("previousSearches", JSON.stringify(previousSearches))
-             //console.log(data)
-             beenSearched(data.name)
-             
-            })
-            fetch (apiUrl5DayForcast)
-            .then(function (response){
-                return response.json();
-            })
-            .then(function(data) {
-                var fiveDayCard = $("#fiveDayCard")
-                var fiveDayTitle = $("<h3>").text("5-Day Forecast")
-                fiveDayCard.append(fiveDayTitle);
-             var container = $("<div>").attr("class", "row");
-             fiveDayCard.append(container)
-             
-             for(var i=0; i < data.list.length; i+=8){
-                 
-                 var day = $("<div>").attr("class", "col-2");
-                 var date = $("<h4>").text(getCityDate(data.list[i].dt));
-                 var image = getIconImage(data.list[i].weather[0].icon)
-                 var temp = $("<p>").text("Temp: " + data.list[i].main.temp + " F\u00B0");
-                 var wind =$("<p>").text("Wind: " + data.list[i].wind.speed + "mph")
-                 var humidity = $("<p>").text("Humidity: " + data.list[i].main.humidity + "%")
-                 day.append(date);
-                 day.append(image);
-                 day.append(temp);
-                 day.append(wind);
-                 day.append(humidity);
-                 container.append(day);
-                }
-                // console.log(data);
-            })
-            $("#city").val("")
-            if (previousSearches === undefined){
-                return;
-            }else {
-            renderSearches();
+    fetch(apiUrlCurrent)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            var cityName = $("<h3>")
+
+            var temperature = $("<p>").text("Temp: " + data.main.temp + " F\u00B0")
+            var windSpeed = $("<p>").text("Wind Speed: " + data.wind.speed + "mph")
+            var humidity = $("<p>").text("Humidity: " + data.main.humidity + "%")
+            var currentWeather = $("#currentWeatherCard")
+            var image = getIconImage(data.weather[0].icon)
+            var cityDate = getCityDate(data.dt)
+            cityName[0].innerHTML = data.name + cityDate
+            cityName.append(image)
+            currentWeather.append(cityName)
+            currentWeather.append(temperature)
+            currentWeather.append(windSpeed)
+            currentWeather.append(humidity)
+            saveSearches(data.name)
+            renderSearches()
+        })
+    fetch(apiUrl5DayForcast)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            var fiveDayCard = $("#fiveDayCard")
+            var fiveDayTitle = $("<h3>").text("5-Day Forecast")
+            fiveDayCard.append(fiveDayTitle);
+            var container = $("<div>").attr("class", "row");
+            fiveDayCard.append(container)
+
+            for (var i = 0; i < data.list.length; i += 8) {
+
+                var day = $("<div>").attr("class", "col-2");
+                var date = $("<h4>").text(getCityDate(data.list[i].dt));
+                var image = getIconImage(data.list[i].weather[0].icon)
+                var temp = $("<p>").text("Temp: " + data.list[i].main.temp + " F\u00B0");
+                var wind = $("<p>").text("Wind: " + data.list[i].wind.speed + "mph")
+                var humidity = $("<p>").text("Humidity: " + data.list[i].main.humidity + "%")
+                day.append(date);
+                day.append(image);
+                day.append(temp);
+                day.append(wind);
+                day.append(humidity);
+                container.append(day);
             }
-        }
+            // console.log(data);
+        })
+    $("#city").val("")
+    
+}
+$("#previousSearches").submit( function (e){
+    console.log(e.target.innerHTML);
+    e.target.innerHTML =  $("#city").val()
+    citySearch()
+})
+
