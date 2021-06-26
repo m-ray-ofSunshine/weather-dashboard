@@ -29,7 +29,7 @@ function redoSearch(city) {
 
 
 function getCurrentWeather(city) {
-    var apiUrlCurrent = "http://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + apiKey
+    var apiUrlCurrent = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=" + apiKey
     fetch(apiUrlCurrent)
     .then(function (response) {
         return response.json();
@@ -60,7 +60,7 @@ function renderCurrentWeather(currentData){
 
 
     function get5DayForecast (city){
-        var apiUrl5DayForcast = "http://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey
+        var apiUrl5DayForcast = "https://api.openweathermap.org/data/2.5/forecast?q=" + city + "&units=imperial&appid=" + apiKey
         fetch(apiUrl5DayForcast)
         .then(function (response) {
             return response.json();
@@ -102,7 +102,7 @@ function getCityDate(unix) {
 }
 
 function getIconImage(iconCode) {
-    var iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+    var iconUrl = "https://openweathermap.org/img/w/" + iconCode + ".png";
     var image = $("<img>")
     image.attr({src: iconUrl, width: 50, height: 50});
     return image;
