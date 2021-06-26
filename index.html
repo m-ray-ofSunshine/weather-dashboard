@@ -9,12 +9,12 @@
     <title>Weather Dashboard</title>
 </head>
 <body>
-    <div class="container-fluid test1"  >
-        <div class="col-12 test2" >
+    <div class="container-fluid"  >
+        <div class="col-12 d-flex justify-content-center"  >
             <h1>Weather Dashboard</h1>
         </div>
         <div class="row">
-            <div class="col-3 test3" id="searchResults">
+            <div class="col-md-3 col-sm-12" id="searchResults">
                 <h2>Search for a City:</h2>
                 <form>
                     <input type="text" id="city" placeholder="St. Paul">
@@ -22,11 +22,11 @@
                 </form>
                 <div class="row" id="previousSearches"></div>
             </div>
-            <div class="col-9 test1">
-                <div id="currentWeatherCard" class="col-12 test2">
+            <div class="col-sm-12 col-md-9">
+                <div id="currentWeatherCard" class="col-12 d-flex flex-column justify-content-center">
                 </div>
-                <div id="fiveDayCard" class="col-12 test3">
-                    <div id="fiveDay" class="row"></div>
+                <div id="fiveDayCard" class="col-12">
+                    <div id="fiveDay" class="row d-flex justify-content-center"></div>
                 </div>
             </div>
         </div>
